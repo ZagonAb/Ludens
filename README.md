@@ -1,4 +1,4 @@
-# FlatFlix
+# Luden
 
 - Luden — a minimalist theme for Pegasus Frontend, inspired by [Ludo Frontend](https://ludo.libretro.com/) and focused on clean visuals and smooth navigation.
 
