@@ -267,7 +267,7 @@ FocusScope {
 
             property bool isSelected: configPanel.focus && configPanel.currentIndex === 3
             property bool isPressed: false
-            property bool isLightTheme: false
+            property bool isLightTheme: root.isLightTheme
 
             Item {
                 id: themeHexagonContainer
@@ -319,7 +319,6 @@ FocusScope {
                         ctx.strokeStyle = root.isLightTheme ? "#000000" : "#ffffff"
                         ctx.lineCap = "round"
                         ctx.lineJoin = "round"
-
                         var vertices = []
                         for (var i = 0; i < 6; i++) {
                             var angle = (Math.PI / 3) * i - Math.PI / 6 + Math.PI / 2
@@ -333,15 +332,12 @@ FocusScope {
                             var current = vertices[j]
                             var next = vertices[(j + 1) % 6]
                             var prev = vertices[(j + 5) % 6]
-
                             var dx1 = current.x - prev.x
                             var dy1 = current.y - prev.y
                             var len1 = Math.sqrt(dx1 * dx1 + dy1 * dy1)
-
                             var dx2 = next.x - current.x
                             var dy2 = next.y - current.y
                             var len2 = Math.sqrt(dx2 * dx2 + dy2 * dy2)
-
                             var startX = current.x - (dx1 / len1) * cornerRadius
                             var startY = current.y - (dy1 / len1) * cornerRadius
                             var endX = current.x + (dx2 / len2) * cornerRadius
@@ -404,6 +400,7 @@ FocusScope {
                     family: global.fonts.sans
                     pixelSize: 12 * vpx
                 }
+
                 color: themeButton.isSelected ? (root.isLightTheme ? "#000000" : "#ffffff") : textSecondary
                 opacity: themeButton.isSelected ? 1.0 : 0.0
 
@@ -439,9 +436,10 @@ FocusScope {
             }
 
             function toggleTheme() {
-                isLightTheme = !isLightTheme
-                root.toggleThemeMode(isLightTheme)
+                root.toggleThemeMode(!root.isLightTheme)
+                isLightTheme = root.isLightTheme
                 themeImage.source = isLightTheme ? "assets/images/icons/light.svg" : "assets/images/icons/night.svg"
+
                 if (isSelected) {
                     themeSelectionCanvas.requestPaint()
                 }
@@ -464,21 +462,19 @@ FocusScope {
             Connections {
                 target: root
                 function onIsLightThemeChanged() {
+                    themeButton.isLightTheme = root.isLightTheme
+                    themeImage.source = themeButton.isLightTheme ? "assets/images/icons/light.svg" : "assets/images/icons/night.svg"
+                    themeLabelText.text = themeButton.isLightTheme ? "Light" : "Dark"
                     if (isSelected) {
                         themeSelectionCanvas.requestPaint()
                     }
-                    themeIconOverlay.color = Qt.binding(function() {
-                        return isSelected ? (root.isLightTheme ? "#000000" : "#ffffff") : textPrimary
-                    })
-                    themeLabelText.color = Qt.binding(function() {
-                        return isSelected ? (root.isLightTheme ? "#000000" : "#ffffff") : textSecondary
-                    })
                 }
             }
 
             Component.onCompleted: {
-                themeButton.isLightTheme = (root.bgPrimary === "#e5e5e5")
-                themeImage.source = isLightTheme ? "assets/images/icons/light.svg" : "assets/images/icons/night.svg"
+                themeButton.isLightTheme = root.isLightTheme
+                themeImage.source = themeButton.isLightTheme ? "assets/images/icons/light.svg" : "assets/images/icons/night.svg"
+                themeLabelText.text = themeButton.isLightTheme ? "Light" : "Dark"
             }
         }
     }

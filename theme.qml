@@ -33,6 +33,7 @@ FocusScope {
         }
 
         saveThemeSettings()
+        root.isLightThemeChanged()
     }
 
     function getHueColor(index) {
