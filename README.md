@@ -24,11 +24,9 @@ These assets are distributed under the terms described in the repository’s [CO
 
 ## 📜 License
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+**Code and Theme Structure:** [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
-
-Some graphical assets are derived from the [RetroArch Assets repository](https://github.com/libretro/retroarch-assets),  
-which is distributed under Creative Commons (CC-BY-SA 4.0 or CC0) terms.  
-All trademarks and related assets remain the property of their respective owners.
+**Assets (Icons):** Derived from RetroArch Assets repository
+- Licensed under CC0 (or CC-BY-SA 4.0 where applicable)
+- See assets/LICENSE or [RetroArch Assets COPYING](https://github.com/libretro/retroarch-assets/blob/master/COPYING)
 
