@@ -25,6 +25,3 @@ These assets are distributed under the terms described in the repository’s [CO
 ## 📜 License
 
 [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
-
-This project is licensed under the **Creative Commons Attribution–NonCommercial–ShareAlike 4.0 International License (CC BY-NC-SA 4.0)**.  
-You are free to use, share, and adapt this work **as long as you provide proper attribution**, **do not use it for commercial purposes**, and **distribute any derivative works under the same license**.
