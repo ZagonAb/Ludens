@@ -9,8 +9,8 @@
 
 ## 🧩 Inspiration
 
-**Luden** takes visual inspiration from [Ludo Frontend](https://ludo.libretro.com), an open-source game launcher developed by the **Libretro Team**.  
-It reimagines Ludo’s minimalist look and feel within the **Pegasus Frontend** environment, adapting its design language for a smooth and modern user experience.
+**Luden** is based on and closely follows the design of [Ludo Frontend](https://ludo.libretro.com), an open-source game launcher developed by the **Libretro Team**.  
+It faithfully adapts Ludo’s minimalist interface and behavior to the **Pegasus Frontend** environment, ensuring compatibility and preserving the original visual identity.
 
 ---
 
