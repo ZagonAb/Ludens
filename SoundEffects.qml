@@ -6,32 +6,32 @@ Item {
 
     property SoundEffect upSound: SoundEffect {
         source: "assets/sounds/up.wav"
-        volume: 1.0
+        volume: 0.7
     }
 
     property SoundEffect downSound: SoundEffect {
         source: "assets/sounds/down.wav"
-        volume: 1.0
+        volume: 0.7
     }
 
     property SoundEffect okSound: SoundEffect {
         source: "assets/sounds/ok.wav"
-        volume: 1.0
+        volume: 0.7
     }
 
     property SoundEffect cancelSound: SoundEffect {
         source: "assets/sounds/cancel.wav"
-        volume: 1.0
+        volume: 0.7
     }
 
     property SoundEffect noticeSound: SoundEffect {
         source: "assets/sounds/notice.wav"
-        volume: 1.0
+        volume: 0.7
     }
 
     property SoundEffect noticeBackSound: SoundEffect {
         source: "assets/sounds/notice_back.wav"
-        volume: 1.0
+        volume: 0.7
     }
 
     function play(soundEffect) {
