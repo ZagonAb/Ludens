@@ -8,6 +8,7 @@ Item {
 
     property var game
     property int collectionIndex: 0
+    property bool hasPlayStats: game && (game.playCount > 0 || game.playTime > 0 || (game.lastPlayed && !isNaN(game.lastPlayed.getTime())))
 
     Rectangle {
         id: screenshotArea
@@ -62,7 +63,7 @@ Item {
         Column {
             id: infoColumn
             width: parent.width
-            spacing: 15 * vpx
+            spacing: 5 * vpx
 
             Text {
                 id: tiTle
@@ -89,43 +90,524 @@ Item {
 
             Column {
                 width: parent.width
-                spacing: 8 * vpx
+                spacing: 12 * vpx
 
-                InfoRow {
-                    label: "Developer"
-                    value: game ? game.developer : ""
-                    visible: game && game.developer
+                Rectangle {
+                    width: parent.width
+                    height: devPubRow.height + 20 * vpx
+                    radius: 8 * vpx
+                    color: "#20FFFFFF"
+                    visible: (game && game.developer) || (game && game.publisher) || (game && game.releaseYear) || (game && game.genre)
+
+                    Row {
+                        id: devPubRow
+                        anchors {
+                            left: parent.left
+                            right: parent.right
+                            verticalCenter: parent.verticalCenter
+                            margins: 12 * vpx
+                        }
+                        spacing: 20 * vpx
+
+                        Column {
+                            width: (parent.width - parent.spacing * 3) / 4
+                            spacing: 6 * vpx
+                            visible: game && game.developer
+
+                            Row {
+                                width: parent.width
+                                spacing: 8 * vpx
+
+                                Rectangle {
+                                    width: 4 * vpx
+                                    height: devContentColumn.height
+                                    color: root.getHueColor(collectionIndex)
+                                    radius: 2 * vpx
+                                }
+
+                                Column {
+                                    id: devContentColumn
+                                    width: parent.width - 12 * vpx
+                                    spacing: 2 * vpx
+
+                                    Text {
+                                        text: "Developer"
+                                        font {
+                                            family: global.fonts.sans
+                                            pixelSize: 11 * vpx
+                                            bold: true
+                                            capitalization: Font.AllUppercase
+                                        }
+                                        color: "#c1c1c1"
+                                    }
+
+                                    Text {
+                                        width: parent.width
+                                        text: game ? game.developer : ""
+                                        font {
+                                            family: global.fonts.sans
+                                            pixelSize: 14 * vpx
+                                        }
+                                        color: "white"
+                                        wrapMode: Text.WordWrap
+                                    }
+                                }
+                            }
+                        }
+
+                        Column {
+                            width: (parent.width - parent.spacing * 3) / 4
+                            spacing: 6 * vpx
+                            visible: game && game.publisher
+
+                            Row {
+                                width: parent.width
+                                spacing: 8 * vpx
+
+                                Rectangle {
+                                    width: 4 * vpx
+                                    height: pubContentColumn.height
+                                    color: root.getHueColor(collectionIndex)
+                                    radius: 2 * vpx
+                                }
+
+                                Column {
+                                    id: pubContentColumn
+                                    width: parent.width - 12 * vpx
+                                    spacing: 2 * vpx
+
+                                    Text {
+                                        text: "Publisher"
+                                        font {
+                                            family: global.fonts.sans
+                                            pixelSize: 11 * vpx
+                                            bold: true
+                                            capitalization: Font.AllUppercase
+                                        }
+                                        color: "#c1c1c1"
+                                    }
+
+                                    Text {
+                                        width: parent.width
+                                        text: game ? game.publisher : ""
+                                        font {
+                                            family: global.fonts.sans
+                                            pixelSize: 14 * vpx
+                                        }
+                                        color: "white"
+                                        wrapMode: Text.WordWrap
+                                    }
+                                }
+                            }
+                        }
+
+                        Column {
+                            width: (parent.width - parent.spacing * 3) / 4
+                            spacing: 6 * vpx
+                            visible: game && game.releaseYear > 0
+
+                            Row {
+                                width: parent.width
+                                spacing: 8 * vpx
+
+                                Rectangle {
+                                    width: 4 * vpx
+                                    height: releaseContentColumn.height
+                                    color: root.getHueColor(collectionIndex)
+                                    radius: 2 * vpx
+                                }
+
+                                Column {
+                                    id: releaseContentColumn
+                                    width: parent.width - 12 * vpx
+                                    spacing: 2 * vpx
+
+                                    Text {
+                                        text: "Release"
+                                        font {
+                                            family: global.fonts.sans
+                                            pixelSize: 11 * vpx
+                                            bold: true
+                                            capitalization: Font.AllUppercase
+                                        }
+                                        color: "#c1c1c1"
+                                    }
+
+                                    Text {
+                                        width: parent.width
+                                        text: game && game.releaseYear > 0 ? game.releaseYear : ""
+                                        font {
+                                            family: global.fonts.sans
+                                            pixelSize: 14 * vpx
+                                        }
+                                        color: "white"
+                                        wrapMode: Text.WordWrap
+                                    }
+                                }
+                            }
+                        }
+
+                        Column {
+                            width: (parent.width - parent.spacing * 3) / 4
+                            spacing: 6 * vpx
+                            visible: game && game.genre
+
+                            Row {
+                                width: parent.width
+                                spacing: 8 * vpx
+
+                                Rectangle {
+                                    width: 4 * vpx
+                                    height: genreContentColumn.height
+                                    color: root.getHueColor(collectionIndex)
+                                    radius: 2 * vpx
+                                }
+
+                                Column {
+                                    id: genreContentColumn
+                                    width: parent.width - 12 * vpx
+                                    spacing: 2 * vpx
+
+                                    Text {
+                                        text: "Genre"
+                                        font {
+                                            family: global.fonts.sans
+                                            pixelSize: 11 * vpx
+                                            bold: true
+                                            capitalization: Font.AllUppercase
+                                        }
+                                        color: "#c1c1c1"
+                                    }
+
+                                    Text {
+                                        width: parent.width
+                                        text: game ? Utils.getFirstGenre(game) : ""
+                                        font {
+                                            family: global.fonts.sans
+                                            pixelSize: 14 * vpx
+                                        }
+                                        color: "white"
+                                        wrapMode: Text.WordWrap
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
 
-                InfoRow {
-                    label: "Publisher"
-                    value: game ? game.publisher : ""
-                    visible: game && game.publisher
+                Row {
+                    width: parent.width
+                    spacing: 5 * vpx
+                    visible: !hasPlayStats && ((game && game.players > 0) || (game && game.rating > 0))
+
+                    Rectangle {
+                        width: (parent.width - parent.spacing) / 2
+                        height: 40 * vpx
+                        radius: 8 * vpx
+                        color: "#20FFFFFF"
+                        visible: game && game.players > 0
+
+                        Column {
+                            anchors.centerIn: parent
+                            spacing: 1 * vpx
+
+                            Text {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: "PLAYERS"
+                                font {
+                                    family: global.fonts.sans
+                                    pixelSize: 10 * vpx
+                                    bold: true
+                                }
+                                color: "#c1c1c1"
+                            }
+
+                            Text {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: game ? game.players : ""
+                                font {
+                                    family: global.fonts.sans
+                                    pixelSize: 14 * vpx
+                                    bold: true
+                                }
+                                color: root.getHueColor(collectionIndex)
+                            }
+                        }
+                    }
+
+                    Rectangle {
+                        width: (parent.width - parent.spacing) / 2
+                        height: 40 * vpx
+                        radius: 8 * vpx
+                        color: "#20FFFFFF"
+                        visible: game && game.rating > 0
+
+                        Column {
+                            anchors {
+                                left: parent.left
+                                right: parent.right
+                                verticalCenter: parent.verticalCenter
+                                margins: 12 * vpx
+                            }
+                            spacing: 2 * vpx
+
+                            Text {
+                                text: "RATING"
+                                font {
+                                    family: global.fonts.sans
+                                    pixelSize: 10 * vpx
+                                    bold: true
+                                }
+                                color: "white"
+                            }
+
+                            Row {
+                                width: parent.width
+                                spacing: 6 * vpx
+
+                                Rectangle {
+                                    width: parent.width - ratingTextCompact.width - parent.spacing
+                                    height: 6 * vpx
+                                    radius: 10 * vpx
+                                    color: "#30FFFFFF"
+                                    anchors.verticalCenter: parent.verticalCenter
+
+                                    Rectangle {
+                                        width: parent.width * (game ? game.rating : 0)
+                                        height: parent.height
+                                        radius: parent.radius
+                                        color: root.getHueColor(collectionIndex)
+                                    }
+                                }
+
+                                Text {
+                                    id: ratingTextCompact
+                                    text: game ? Math.round(game.rating * 100) + "%" : ""
+                                    font {
+                                        family: global.fonts.sans
+                                        pixelSize: 14 * vpx
+                                        bold: true
+                                    }
+                                    color: "white"
+                                }
+                            }
+                        }
+                    }
                 }
 
-                InfoRow {
-                    label: "Release"
-                    value: game && game.releaseYear > 0 ? game.releaseYear : ""
-                    visible: game && game.releaseYear > 0
+                Row {
+                    width: parent.width
+                    spacing: 5 * vpx
+                    visible: hasPlayStats
+
+
+                    Rectangle {
+                        width: (parent.width - parent.spacing * 3) / 4
+                        height: 40 * vpx
+                        radius: 8 * vpx
+                        color: "#20FFFFFF"
+                        visible: game && game.players > 0
+
+                        Column {
+                            anchors.centerIn: parent
+                            spacing: 1 * vpx
+
+                            Text {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: "PLAYERS"
+                                font {
+                                    family: global.fonts.sans
+                                    pixelSize: 10 * vpx
+                                    bold: true
+                                }
+                                color: "#c1c1c1"
+                            }
+
+                            Text {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: game ? game.players : ""
+                                font {
+                                    family: global.fonts.sans
+                                    pixelSize: 14 * vpx
+                                    bold: true
+                                }
+                                color: root.getHueColor(collectionIndex)
+                            }
+                        }
+                    }
+
+                    Rectangle {
+                        width: (parent.width - parent.spacing * 3) / 4
+                        height: 40 * vpx
+                        radius: 8 * vpx
+                        color: "#20FFFFFF"
+                        visible: game && game.playCount > 0
+
+                        Column {
+                            anchors.centerIn: parent
+                            spacing: 1 * vpx
+
+                            Text {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: "PLAY COUNT"
+                                font {
+                                    family: global.fonts.sans
+                                    pixelSize: 10 * vpx
+                                    bold: true
+                                }
+                                color: "#c1c1c1"
+                            }
+
+                            Text {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: game ? game.playCount : ""
+                                font {
+                                    family: global.fonts.sans
+                                    pixelSize: 14 * vpx
+                                    bold: true
+                                }
+                                color: root.getHueColor(collectionIndex)
+                            }
+                        }
+                    }
+
+                    Rectangle {
+                        width: (parent.width - parent.spacing * 3) / 4
+                        height: 40 * vpx
+                        radius: 8 * vpx
+                        color: "#20FFFFFF"
+                        visible: game && game.playTime > 0
+
+                        Column {
+                            anchors.centerIn: parent
+                            spacing: 1 * vpx
+
+                            Text {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: "PLAY TIME"
+                                font {
+                                    family: global.fonts.sans
+                                    pixelSize: 10 * vpx
+                                    bold: true
+                                }
+                                color: "#c1c1c1"
+                            }
+
+                            Text {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: game ? Utils.formatPlayTime(game.playTime) : ""
+                                font {
+                                    family: global.fonts.sans
+                                    pixelSize: 16 * vpx
+                                    bold: true
+                                }
+                                color: root.getHueColor(collectionIndex)
+                            }
+                        }
+                    }
+
+                    Rectangle {
+                        width: (parent.width - parent.spacing * 3) / 4
+                        height: 40 * vpx
+                        radius: 8 * vpx
+                        color: "#20FFFFFF"
+                        visible: game && game.lastPlayed && game.lastPlayed.toString().length > 0
+
+                        Column {
+                            anchors.centerIn: parent
+                            spacing: 1 * vpx
+
+                            Text {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: "LAST PLAYED"
+                                font {
+                                    family: global.fonts.sans
+                                    pixelSize: 10 * vpx
+                                    bold: true
+                                }
+                                color: "#c1c1c1"
+                            }
+
+                            Text {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: game ? Utils.formatShortDate(game.lastPlayed) : ""
+                                font {
+                                    family: global.fonts.sans
+                                    pixelSize: 14 * vpx
+                                    bold: true
+                                }
+                                color: root.getHueColor(collectionIndex)
+                            }
+                        }
+                    }
                 }
 
-                InfoRow {
-                    label: "Genre"
-                    value: game ? game.genre : ""
-                    visible: game && game.genre
+                Rectangle {
+                    width: parent.width
+                    height: 35 * vpx
+                    radius: 8 * vpx
+                    color: "#20FFFFFF"
+                    visible: hasPlayStats && game && game.rating > 0
+
+                    Column {
+                        anchors {
+                            left: parent.left
+                            right: parent.right
+                            verticalCenter: parent.verticalCenter
+                            margins: 12 * vpx
+                        }
+                        spacing: - 4 * vpx
+
+                        Text {
+                            text: "RATING"
+                            font {
+                                family: global.fonts.sans
+                                pixelSize: 10 * vpx
+                                bold: true
+                            }
+                            color: "white"
+                        }
+
+                        Row {
+                            width: parent.width
+                            spacing: 8 * vpx
+
+                            Item {
+                                width: parent.width - ratingText.width - parent.spacing
+                                height: 7 * vpx
+                                anchors.verticalCenter: parent.verticalCenter
+
+                                Rectangle {
+                                    width: parent.width
+                                    height: 7 * vpx
+                                    radius: 10 * vpx
+                                    color: "#30FFFFFF"
+                                    anchors.verticalCenter: parent.verticalCenter
+
+                                    Rectangle {
+                                        width: parent.width * (game ? game.rating : 0)
+                                        height: parent.height
+                                        radius: parent.radius
+                                        color: root.getHueColor(collectionIndex)
+                                    }
+                                }
+                            }
+
+                            Text {
+                                id: ratingText
+                                text: game ? Math.round(game.rating * 100) + "%" : ""
+                                font {
+                                    family: global.fonts.sans
+                                    pixelSize: 16 * vpx
+                                    bold: true
+                                }
+                                color: "white"
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
+                    }
                 }
 
-                InfoRow {
-                    label: "Players"
-                    value: game ? game.players : ""
-                    visible: game && game.players > 1
-                }
-
-                InfoRow {
-                    label: "Play Count"
-                    value: game ? game.playCount : ""
-                    visible: game && game.playCount > 0
-                }
             }
 
             Item {
