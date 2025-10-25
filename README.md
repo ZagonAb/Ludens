@@ -49,4 +49,14 @@ Cualquier aporte, por pequeño que sea, me ayuda a seguir mejorando y manteniend
 
 [![Apoyar en PayPal](https://img.shields.io/badge/☕%20Invitame%20un%20café%20-%20PayPal-ff69b4?style=for-the-badge)](https://paypal.me/ZagonAb)
 
+### 💖 Apoyá el proyecto
+
+[![Donate](https://img.shields.io/badge/Donate-PayPal-blue.svg)](https://paypal.me/ZagonAb)
+
+### ☕ Apoyá mi trabajo
+
+[![Donar con PayPal](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://paypal.me/ZagonAb)
+
+
+
 
