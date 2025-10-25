@@ -1,4 +1,5 @@
 import QtQuick 2.15
+import QtGraphicalEffects 1.12
 import "utils.js" as Utils
 
 FocusScope {
@@ -72,7 +73,7 @@ FocusScope {
                 text: collection ? collection.name : ""
                 font {
                     family: global.fonts.sans
-                    pixelSize: 20 * vpx
+                    pixelSize: 25 * vpx
                 }
                 color: root.getHueColor(collectionIndex)
                 horizontalAlignment: Text.AlignHCenter
@@ -84,7 +85,7 @@ FocusScope {
                 text: collection ? collection.games.count + " Games" : ""
                 font {
                     family: global.fonts.sans
-                    pixelSize: 16 * vpx
+                    pixelSize: 20 * vpx
                 }
                 color: root.getHueColor(collectionIndex)
                 horizontalAlignment: Text.AlignHCenter

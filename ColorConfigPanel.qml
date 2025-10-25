@@ -226,8 +226,8 @@ FocusScope {
                 anchors.fill: resetHexagonContainer
                 onClicked: {
                     resetButton.animateResetButton()
-                    root.hueSaturation = 0.8
-                    root.hueLightness = 0.59
+                    root.hueSaturation = 0.4
+                    root.hueLightness = 0.49
                 }
             }
 
@@ -516,8 +516,8 @@ FocusScope {
             soundManager.playOk()
             if (currentIndex === 2) {
                 resetButton.animateResetButton()
-                root.hueSaturation = 0.8
-                root.hueLightness = 0.59
+                root.hueSaturation = 0.4
+                root.hueLightness = 0.49
             } else if (currentIndex === 3) {
                 themeButton.animateThemeButton()
                 themeButton.toggleTheme()

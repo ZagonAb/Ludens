@@ -96,7 +96,7 @@ Item {
                     width: parent.width
                     height: devPubRow.height + 20 * vpx
                     radius: 8 * vpx
-                    color: "#20FFFFFF"
+                    color: "#66000000"
                     visible: (game && game.developer) || (game && game.publisher) || (game && game.releaseYear) || (game && game.genre)
 
                     Row {
@@ -138,7 +138,7 @@ Item {
                                             bold: true
                                             capitalization: Font.AllUppercase
                                         }
-                                        color: "#c1c1c1"
+                                        color: "#a1a1a1"
                                     }
 
                                     Text {
@@ -184,7 +184,7 @@ Item {
                                             bold: true
                                             capitalization: Font.AllUppercase
                                         }
-                                        color: "#c1c1c1"
+                                        color: "#a1a1a1"
                                     }
 
                                     Text {
@@ -230,7 +230,7 @@ Item {
                                             bold: true
                                             capitalization: Font.AllUppercase
                                         }
-                                        color: "#c1c1c1"
+                                        color: "#a1a1a1"
                                     }
 
                                     Text {
@@ -276,7 +276,7 @@ Item {
                                             bold: true
                                             capitalization: Font.AllUppercase
                                         }
-                                        color: "#c1c1c1"
+                                        color: "#a1a1a1"
                                     }
 
                                     Text {
@@ -304,7 +304,7 @@ Item {
                         width: (parent.width - parent.spacing) / 2
                         height: 40 * vpx
                         radius: 8 * vpx
-                        color: "#20FFFFFF"
+                        color: "#66000000"
                         visible: game && game.players > 0
 
                         Column {
@@ -319,7 +319,7 @@ Item {
                                     pixelSize: 10 * vpx
                                     bold: true
                                 }
-                                color: "#c1c1c1"
+                                color: "#a1a1a1"
                             }
 
                             Text {
@@ -339,7 +339,7 @@ Item {
                         width: (parent.width - parent.spacing) / 2
                         height: 40 * vpx
                         radius: 8 * vpx
-                        color: "#20FFFFFF"
+                        color: "#66000000"
                         visible: game && game.rating > 0
 
                         Column {
@@ -369,7 +369,7 @@ Item {
                                     width: parent.width - ratingTextCompact.width - parent.spacing
                                     height: 6 * vpx
                                     radius: 10 * vpx
-                                    color: "#30FFFFFF"
+                                    color: "#80FFFFFF"
                                     anchors.verticalCenter: parent.verticalCenter
 
                                     Rectangle {
@@ -405,7 +405,7 @@ Item {
                         width: (parent.width - parent.spacing * 3) / 4
                         height: 40 * vpx
                         radius: 8 * vpx
-                        color: "#20FFFFFF"
+                        color: "#66000000"
                         visible: game && game.players > 0
 
                         Column {
@@ -420,7 +420,7 @@ Item {
                                     pixelSize: 10 * vpx
                                     bold: true
                                 }
-                                color: "#c1c1c1"
+                                color: "#a1a1a1"
                             }
 
                             Text {
@@ -440,7 +440,7 @@ Item {
                         width: (parent.width - parent.spacing * 3) / 4
                         height: 40 * vpx
                         radius: 8 * vpx
-                        color: "#20FFFFFF"
+                        color: "#66000000"
                         visible: game && game.playCount > 0
 
                         Column {
@@ -455,7 +455,7 @@ Item {
                                     pixelSize: 10 * vpx
                                     bold: true
                                 }
-                                color: "#c1c1c1"
+                                color: "#a1a1a1"
                             }
 
                             Text {
@@ -475,7 +475,7 @@ Item {
                         width: (parent.width - parent.spacing * 3) / 4
                         height: 40 * vpx
                         radius: 8 * vpx
-                        color: "#20FFFFFF"
+                        color: "#66000000"
                         visible: game && game.playTime > 0
 
                         Column {
@@ -490,7 +490,7 @@ Item {
                                     pixelSize: 10 * vpx
                                     bold: true
                                 }
-                                color: "#c1c1c1"
+                                color: "#a1a1a1"
                             }
 
                             Text {
@@ -510,7 +510,7 @@ Item {
                         width: (parent.width - parent.spacing * 3) / 4
                         height: 40 * vpx
                         radius: 8 * vpx
-                        color: "#20FFFFFF"
+                        color: "#66000000"
                         visible: game && game.lastPlayed && game.lastPlayed.toString().length > 0
 
                         Column {
@@ -525,7 +525,7 @@ Item {
                                     pixelSize: 10 * vpx
                                     bold: true
                                 }
-                                color: "#c1c1c1"
+                                color: "#a1a1a1"
                             }
 
                             Text {
@@ -546,7 +546,7 @@ Item {
                     width: parent.width
                     height: 35 * vpx
                     radius: 8 * vpx
-                    color: "#20FFFFFF"
+                    color: "#66000000"
                     visible: hasPlayStats && game && game.rating > 0
 
                     Column {
@@ -581,7 +581,7 @@ Item {
                                     width: parent.width
                                     height: 7 * vpx
                                     radius: 10 * vpx
-                                    color: "#30FFFFFF"
+                                    color: "#80FFFFFF"
                                     anchors.verticalCenter: parent.verticalCenter
 
                                     Rectangle {

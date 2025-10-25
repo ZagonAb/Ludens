@@ -211,7 +211,6 @@ function formatReleaseYear(releaseYear) {
     return releaseYear.toString();
 }
 
-
 function getUniqueGenresFromGames(maxGenres) {
     var uniqueGenres = new Set();
     var genreCount = {};

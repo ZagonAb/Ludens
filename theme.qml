@@ -16,8 +16,8 @@ FocusScope {
     readonly property real vpx: Math.min(width, height) / 720
     readonly property real hexSize: 180 * vpx
 
-    property real hueSaturation: 0.8
-    property real hueLightness: 0.59
+    property real hueSaturation: 0.4
+    property real hueLightness: 0.49
 
     SoundEffects {
         id: soundManager
@@ -44,7 +44,6 @@ FocusScope {
     }
 
     function getHueColor(index) {
-
         var totalCollections = 0
 
         if (collectionView &&
@@ -57,14 +56,16 @@ FocusScope {
                 totalCollections = api.collections.count + 2
             }
 
-            if (totalCollections <= 1) return Qt.hsla(0.083, hueSaturation, hueLightness, 1.0)
+            if (totalCollections <= 1)
+                return Qt.hsla(0.0666, hueSaturation, hueLightness, 1.0)
 
-                var startHue = 0.083
+                var startHue = 0.0666
                 var hueIncrement = 1.0 / totalCollections
                 var hue = (startHue - hueIncrement * index + 1.0) % 1.0
 
                 return Qt.hsla(hue, hueSaturation, hueLightness, 1.0)
     }
+
 
     function saveColorSettings() {
         api.memory.set('hueSaturation', hueSaturation)
