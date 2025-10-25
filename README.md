@@ -42,9 +42,7 @@ All my themes are developed freely and shared with everyone, but if you'd like t
 Every contribution, no matter how small, helps me continue improving and maintaining these projects 👾  
 
 [![Support on PayPal](https://img.shields.io/badge/💖%20Donate%20-%20PayPal-0070ba?style=for-the-badge)](https://paypal.me/ZagonAb)
-
-
-
+[![Donate using Liberapay](https://liberapay.com/assets/widgets/donate.svg)](https://liberapay.com/Gonzalo/donate)
 
 
 
