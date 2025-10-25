@@ -282,6 +282,8 @@ ListView {
 
                         function getRegionVariants(flagIndex) {
                             var variants = [];
+                            if (!regionFlags || regionFlags.length === 0) return variants;
+
                             var baseIndex = flagIndex * 7;
                             for (var i = baseIndex; i < Math.min(baseIndex + 7, regionFlags.length); i++) {
                                 variants.push(regionFlags[i]);
@@ -314,12 +316,6 @@ ListView {
 
         onIsCurrentChanged: {
             bubbleCanvas.requestPaint()
-        }
-    }
-
-    onCurrentGameChanged: {
-        if (currentItem) {
-            currentItem.favoriteIndicator.visible = currentGame ? currentGame.favorite : false
         }
     }
 

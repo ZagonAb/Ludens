@@ -34,7 +34,7 @@ FocusScope {
 
             Connections {
                 target: root
-                onHueSaturationChanged: {
+                function onHueSaturationChanged() {
                     saturationSlider.value = root.hueSaturation
                 }
             }
@@ -56,7 +56,7 @@ FocusScope {
 
             Connections {
                 target: root
-                onHueLightnessChanged: {
+                function onHueLightnessChanged() {
                     lightnessSlider.value = root.hueLightness
                 }
             }
@@ -245,16 +245,16 @@ FocusScope {
             }
 
             onIsSelectedChanged: {
-                if (isSelected) {
-                    resetSelectionCanvas.requestPaint()
+                if (resetButton.isSelected) {
+                    resetButton.resetSelectionCanvas.requestPaint()
                 }
             }
 
             Connections {
                 target: root
                 function onIsLightThemeChanged() {
-                    if (isSelected) {
-                        resetSelectionCanvas.requestPaint()
+                    if (resetButton.isSelected) {
+                        resetButton.resetSelectionCanvas.requestPaint()
                     }
                 }
             }
@@ -454,8 +454,9 @@ FocusScope {
             }
 
             onIsSelectedChanged: {
-                if (isSelected) {
-                    themeSelectionCanvas.requestPaint()
+
+                if (themeButton.isSelected) {
+                    themeButton.themeSelectionCanvas.requestPaint()
                 }
             }
 
@@ -465,8 +466,8 @@ FocusScope {
                     themeButton.isLightTheme = root.isLightTheme
                     themeImage.source = themeButton.isLightTheme ? "assets/images/icons/light.svg" : "assets/images/icons/night.svg"
                     themeLabelText.text = themeButton.isLightTheme ? "Light" : "Dark"
-                    if (isSelected) {
-                        themeSelectionCanvas.requestPaint()
+                    if (themeButton.isSelected) {
+                        themeButton.themeSelectionCanvas.requestPaint()
                     }
                 }
             }

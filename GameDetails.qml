@@ -68,7 +68,8 @@ Item {
             Text {
                 id: tiTle
                 width: parent.width
-                text: Utils.cleanGameTitle(game.title)
+                text: game ? Utils.cleanGameTitle(game.title) : ""
+                visible: game !== null
                 font {
                     family: global.fonts.sans
                     pixelSize: 24 * vpx
