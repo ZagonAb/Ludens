@@ -37,9 +37,9 @@ It reimagines Ludo’s minimalist look and feel within the **Pegasus Frontend** 
 [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
 ### 💖 DONATE
-I create **Pegasus Frontend** themes purely out of passion for classic games and the retro community.  
-All my themes are developed freely and shared with everyone, but if you'd like to show your appreciation or help me keep creating and improving them, you can leave a voluntary donation.  
-Every contribution, no matter how small, helps me continue improving and maintaining these projects 👾  
+I create **Pegasus Frontend** themes purely out of passion for classic games and the retro community.
+All my themes are developed freely and shared with everyone, but if you'd like to show your appreciation or help me keep creating and improving them, you can leave a voluntary donation.
+Every contribution, no matter how small, helps me continue improving and maintaining these projects 👾
 
 [![Support on PayPal](https://img.shields.io/badge/💖%20Donate%20-%20PayPal-0070ba?style=for-the-badge)](https://paypal.me/ZagonAb)
 [![Donate using Liberapay](https://liberapay.com/assets/widgets/donate.svg)](https://liberapay.com/Gonzalo/donate)
