@@ -83,6 +83,7 @@ Item {
         source: iconSource
         fillMode: Image.PreserveAspectFit
         smooth: true
+        mipmap: true
         visible: iconSource !== ""
     }
 
