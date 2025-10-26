@@ -124,6 +124,7 @@ FocusScope {
 
     BottomBar {
         id: bottomBar
+
         anchors {
             left: parent.left
             right: parent.right

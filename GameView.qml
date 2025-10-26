@@ -11,6 +11,7 @@ FocusScope {
 
     Rectangle {
         id: leftPanel
+
         anchors {
             left: parent.left
             top: parent.top
