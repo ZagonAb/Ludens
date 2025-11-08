@@ -7,6 +7,8 @@ FocusScope {
     property var currentGame: null
     property int collectionIndex: 0
     property int currentRaIndex: 0
+    property int updateAttempts: 0
+    property int previousRaCount: 0
     property bool canShow: currentGame && currentGame.retroAchievementsCount > 0
 
     signal backRequested()
@@ -20,6 +22,15 @@ FocusScope {
 
     y: targetY
     x: (300 - 20) * vpx
+
+    Timer {
+        id: updateTimer
+        interval: 1000
+        repeat: false
+        onTriggered: {
+            checkUpdateCompletion()
+        }
+    }
 
     Rectangle {
         id: raPanel
@@ -50,6 +61,8 @@ FocusScope {
             color: root.getHueColor(collectionIndex)
             radius: 12 * vpx
 
+            property bool updatingRA: false
+
             Row {
                 anchors {
                     left: parent.left
@@ -65,22 +78,60 @@ FocusScope {
                     iconSource: ""
                     anchors.verticalCenter: parent.verticalCenter
 
-                    Image {
-                        id: achievementIcon
+                    Item {
+                        id: spinnerContainer
                         anchors.centerIn: parent
                         width: parent.width * 0.6
                         height: parent.height * 0.6
-                        source: "assets/images/icons/achievement.svg"
-                        fillMode: Image.PreserveAspectFit
-                        smooth: true
-                        mipmap: true
-                        visible: false
+                        visible: raHeader.updatingRA
+                        rotation: 0
+
+                        Image {
+                            id: spinnerIcon
+                            anchors.fill: parent
+                            source: "assets/images/icons/spinner.png"
+                            fillMode: Image.PreserveAspectFit
+                            smooth: true
+                            mipmap: true
+                        }
+
+                        ColorOverlay {
+                            anchors.fill: spinnerIcon
+                            source: spinnerIcon
+                            color: root.getHueColor(collectionIndex)
+                        }
+
+                        RotationAnimator {
+                            target: spinnerContainer
+                            from: 0
+                            to: 360
+                            duration: 1000
+                            loops: Animation.Infinite
+                            running: raHeader.updatingRA
+                        }
                     }
 
-                    ColorOverlay {
-                        anchors.fill: achievementIcon
-                        source: achievementIcon
-                        color: root.getHueColor(collectionIndex)
+                    Item {
+                        id: achievementContainer
+                        anchors.centerIn: parent
+                        width: parent.width * 0.6
+                        height: parent.height * 0.6
+                        visible: !raHeader.updatingRA
+
+                        Image {
+                            id: achievementIcon
+                            anchors.fill: parent
+                            source: "assets/images/icons/achievement.svg"
+                            fillMode: Image.PreserveAspectFit
+                            smooth: true
+                            mipmap: true
+                        }
+
+                        ColorOverlay {
+                            anchors.fill: achievementIcon
+                            source: achievementIcon
+                            color: root.getHueColor(collectionIndex)
+                        }
                     }
                 }
 
@@ -446,17 +497,60 @@ FocusScope {
             height: 40 * vpx
             color: "transparent"
 
+            Component {
+                id: footerItemComponent
+
+                Row {
+                    spacing: 5 * vpx
+                    anchors.verticalCenter: parent.verticalCenter
+                    opacity: modelData.enabled !== undefined ? (modelData.enabled ? 1.0 : 0.5) : 1.0
+
+                    Image {
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 18 * vpx
+                        height: 18 * vpx
+                        source: modelData.icon
+                        fillMode: Image.PreserveAspectFit
+                        smooth: true
+                    }
+
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: raHeader.updatingRA && modelData.text === "Update RA" ? "Updating..." : modelData.text
+                        font {
+                            family: global.fonts.sans
+                            pixelSize: 14 * vpx
+                        }
+                        color: textSecondary
+                    }
+                }
+            }
+
             Row {
                 anchors.centerIn: parent
-                spacing: 30 * vpx
+                spacing: 20 * vpx
 
-                Text {
-                    text: "↑↓ Navigate  •  B Back"
-                    font {
-                        family: global.fonts.sans
-                        pixelSize: 11 * vpx
+                property var footerItems: [
+                    {
+                        icon: "assets/images/icons/navigate2.png",
+                        text: "Navigate",
+                        enabled: !raHeader.updatingRA
+                    },
+                    {
+                        icon: raHeader.updatingRA ? "assets/images/icons/update.svg" : "assets/images/icons/ok.png",
+                        text: "Update RA",
+                        enabled: !raHeader.updatingRA
+                    },
+                    {
+                        icon: "assets/images/icons/back.png",
+                        text: "Back",
+                        enabled: !raHeader.updatingRA
                     }
-                    color: textSecondary
+                ]
+
+                Repeater {
+                    model: parent.footerItems
+                    delegate: footerItemComponent
                 }
             }
         }
@@ -484,6 +578,10 @@ FocusScope {
             event.accepted = true
             soundManager.playCancel()
             hide()
+        } else if (api.keys.isAccept(event)) {
+            event.accepted = true
+            soundManager.playOk()  // Cambiado de 'playOk()' a 'playAccept()'
+            updateRetroAchievementsData()
         } else if (api.keys.isUp(event)) {
             event.accepted = true
             soundManager.playUp()
@@ -594,5 +692,47 @@ FocusScope {
             }
 
             return achievements
+    }
+
+    function updateRetroAchievementsData() {
+        if (!currentGame || typeof currentGame.updateRetroAchievements !== 'function' || raHeader.updatingRA) {
+            return
+        }
+
+        raHeader.updatingRA = true
+        raListView.enabled = false
+        previousRaCount = currentGame.retroAchievementsCount
+        updateAttempts = 0
+
+        currentGame.updateRetroAchievements()
+        updateTimer.start()
+    }
+
+    function checkUpdateCompletion() {
+        updateAttempts++
+
+        if (currentGame.retroAchievementsCount !== previousRaCount || updateAttempts >= 5) {
+            completeUpdate()
+        } else {
+            updateTimer.start()
+        }
+    }
+
+    function completeUpdate() {
+        raListView.model = createSortedModel()
+        raHeader.updatingRA = false
+        raListView.enabled = true
+
+        progressBar.progressRatio = Qt.binding(function() {
+            if (!currentGame || currentGame.retroAchievementsCount === 0) return 0
+                var total = currentGame.retroAchievementsCount
+                var unlocked = 0
+                for (var i = 0; i < total; i++) {
+                    if (currentGame.isRaUnlockedAt(i)) unlocked++
+                }
+                return unlocked / total
+        })
+
+        updateAttempts = 0
     }
 }
