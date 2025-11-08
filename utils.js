@@ -1,4 +1,5 @@
 .pragma library
+var fallbackIcon = null;
 
 function cleanGameTitle(title) {
     if (!title || typeof title !== 'string') {
@@ -42,16 +43,16 @@ function cleanGameTitle(title) {
 }
 
 function getRegionFlag(title, files) {
-    let flagVariants = getRegionFromString(title);
+    let flagPaths = getRegionFromString(title);
 
-    if (flagVariants.length === 0 && files && files.get) {
+    if (flagPaths.length === 0 && files && files.get) {
         let firstFile = files.get(0);
         if (firstFile && firstFile.name) {
-            flagVariants = getRegionFromString(firstFile.name);
+            flagPaths = getRegionFromString(firstFile.name);
         }
     }
 
-    return flagVariants;
+    return flagPaths;
 }
 
 function getRegionFromString(text) {
@@ -62,74 +63,86 @@ function getRegionFromString(text) {
     const regionPatterns = [
         {
             id: 'spain',
-            patterns: [/^Spain$/i, /^ES$/i, /^Es$/i, /^Spa$/i],
-            flagVariants: ["Spain","Es", "ES", "Spa", "spain", "es", "spa"],
+            patterns: [/Spain/i, /\bES\b/i, /\bSpa\b/i],
+            flagFile: "Spain.png",
             priority: 1
         },
         {
             id: 'germany',
-            patterns: [/^Germany$/i, /^DE$/i, /^De$/i, /^Ger$/i],
-            flagVariants: ["Germany", "DE", "Ger", "De", "germany", "de", "ger"],
+            patterns: [/Germany/i, /\bDE\b/i, /\bGer\b/i],
+            flagFile: "DE.png",
             priority: 1
         },
         {
             id: 'italy',
-            patterns: [/^Italy$/i, /^IT$/i, /^It$/i],
-            flagVariants: ["Italy", "IT", "It", "italy", "it", "Ita"],
+            patterns: [/Italy/i, /\bIT\b/i, /\bIta\b/i],
+            flagFile: "Ita.png",
             priority: 1
         },
         {
             id: 'usa',
-            patterns: [/^USA$/i, /^US$/i, /^U\.S\.A\.$/i, /^United States$/i],
-            flagVariants: ["USA", "US", "Usa", "usa", "us", "United States", "united states"],
+            patterns: [/\bUSA\b/i, /\bUS\b/i, /United States/i],
+            flagFile: "USA.png",
             priority: 1
         },
         {
             id: 'japan',
-            patterns: [/^Japan$/i, /^JPN$/i, /^JP$/i, /^J$/i, /^Ja$/i],
-            flagVariants: ["Japan", "JPN", "JP", "J", "Ja", "japan", "jpn", "jp", "j", "ja"],
+            patterns: [/Japan/i, /\bJPN\b/i, /\bJP\b/i, /\bJ\b(?![a-z])/i],
+            flagFile: "Japan.png",
             priority: 1
         },
         {
             id: 'europe',
-            patterns: [/^Europe$/i, /^EUR$/i, /^EU$/i, /^E$/i],
-            flagVariants: ["Europe", "EUR", "EU", "E", "europe", "eur", "eu", "e", "Eu"],
+            patterns: [/Europe/i, /\bEUR\b/i, /\bEU\b/i, /\bE\b(?![a-z])/i],
+            flagFile: "Eu.png",
             priority: 2
         },
         {
             id: 'uk',
-            patterns: [/^UK$/i, /^England$/i, /^Britain$/i, /^GB$/i, /^En$/i],
-            flagVariants: ["England", "Britain", "GB", "En", "uk", "england", "britain", "gb", "en"],
+            patterns: [/\bUK\b/i, /England/i, /Britain/i, /\bGB\b/i],
+            flagFile: "uk.png",
             priority: 1
         },
         {
             id: 'france',
-            patterns: [/^France$/i, /^FR$/i, /^Fr$/i],
-            flagVariants: ["France", "FR", "Fr", "france", "fr"],
+            patterns: [/France/i, /\bFR\b/i, /\bFra\b/i],
+            flagFile: "Fr.png",
             priority: 1
         },
         {
             id: 'brazil',
-            patterns: [/^Brazil$/i, /^BR$/i, /^Pt-BR$/i],
-            flagVariants: ["Brazil", "BR", "Brazil", "br", "brazil"],
+            patterns: [/Brazil/i, /\bBR\b/i, /Pt-BR/i],
+            flagFile: "BR.png",
             priority: 1
         },
         {
             id: 'netherlands',
-            patterns: [/^Netherlands$/i, /^NL$/i, /^Nl$/i, /^NLD$/i, /^Dutch$/i, /^Neerland(e|é)s$/i],
-            flagVariants: ["Netherlands", "NL", "Nl", "NLD", "Dutch", "Neerlandes", "netherlands", "nl", "nld", "dutch", "neerlandes"],
+            patterns: [/Netherlands/i, /\bNL\b/i, /Dutch/i, /Neerlande/i],
+            flagFile: "NL.png",
             priority: 1
         },
         {
-            id: 'pal',
-            patterns: [/^PAL$/i],
-            flagVariants: ["PAL", "pal"],
-            priority: 3
+            id: 'korea',
+            patterns: [/Korea/i, /\bKR\b/i, /\bKOR\b/i],
+            flagFile: "Korea.png",
+            priority: 1
+        },
+        {
+            id: 'taiwan',
+            patterns: [/Taiwan/i, /\bTW\b/i],
+            flagFile: "Taiwan.png",
+            priority: 1
+        },
+        {
+            id: 'sweden',
+            patterns: [/Sweden/i, /\bSE\b/i, /\bSv\b/i],
+            flagFile: "Sv.png",
+            priority: 1
         },
         {
             id: 'world',
-            patterns: [/^World$/i, /^W$/i, /^All$/i, /^Intl$/i, /^International$/i, /^Global$/i],
-            flagVariants: ["World", "W", "All", "Intl", "International", "Global", "world", "w", "all", "intl", "international", "global"],
+            patterns: [/World/i, /\bW\b(?![a-z])/i, /International/i],
+            flagFile: "World.png",
             priority: 4
         }
     ];
@@ -140,40 +153,14 @@ function getRegionFromString(text) {
     if (parenthesisMatches) {
         parenthesisMatches.forEach(match => {
             const content = match.replace(/[()]/g, '').trim();
-            const hasCommas = content.includes(',');
-            if (hasCommas) {
+
+            if (content.includes(',')) {
                 const parts = content.split(',').map(part => part.trim());
                 parts.forEach(part => {
-                    for (let region of regionPatterns) {
-                        for (let pattern of region.patterns) {
-                            if (pattern.test(part)) {
-                                if (!detectedRegions.some(r => r.flagVariants[0] === region.flagVariants[0])) {
-                                    detectedRegions.push({
-                                        flagVariants: region.flagVariants,
-                                        priority: region.priority,
-                                        position: text.indexOf(match)
-                                    });
-                                }
-                                break;
-                            }
-                        }
-                    }
+                    checkRegion(part, regionPatterns, detectedRegions, text.indexOf(match));
                 });
             } else {
-                for (let region of regionPatterns) {
-                    for (let pattern of region.patterns) {
-                        if (pattern.test(content)) {
-                            if (!detectedRegions.some(r => r.flagVariants[0] === region.flagVariants[0])) {
-                                detectedRegions.push({
-                                    flagVariants: region.flagVariants,
-                                    priority: region.priority,
-                                    position: text.indexOf(match)
-                                });
-                            }
-                            break;
-                        }
-                    }
-                }
+                checkRegion(content, regionPatterns, detectedRegions, text.indexOf(match));
             }
         });
     }
@@ -182,15 +169,39 @@ function getRegionFromString(text) {
         detectedRegions.sort((a, b) => a.position - b.position);
 
         let flagPaths = [];
-        for (let region of detectedRegions.slice(0, 8)) {
-            for (let variant of region.flagVariants) {
-                flagPaths.push("assets/images/flags/" + variant + ".png");
+        let addedFlags = new Set();
+
+        for (let region of detectedRegions) {
+            if (flagPaths.length >= 8) break;
+
+            if (!addedFlags.has(region.flagFile)) {
+                flagPaths.push("assets/images/flags/" + region.flagFile);
+                addedFlags.add(region.flagFile);
             }
         }
+
         return flagPaths;
     }
 
     return [];
+}
+
+function checkRegion(text, regionPatterns, detectedRegions, position) {
+    for (let region of regionPatterns) {
+        for (let pattern of region.patterns) {
+            if (pattern.test(text)) {
+                if (!detectedRegions.some(r => r.id === region.id)) {
+                    detectedRegions.push({
+                        id: region.id,
+                        flagFile: region.flagFile,
+                        priority: region.priority,
+                        position: position
+                    });
+                }
+                return;
+            }
+        }
+    }
 }
 
 function isFavorite(game) {
@@ -329,36 +340,33 @@ function formatShortDate(dateString) {
     }
 }
 
-
-
-
 function getGameCollectionShortName(gameData) {
     if (!gameData) return "";
 
-    if (gameData.collections && gameData.collections.count > 0) {
-        var firstCollection = gameData.collections.get(0);
-        if (firstCollection && firstCollection.shortName) {
-            return firstCollection.shortName;
-        }
+    if (gameData.collection && gameData.collection.shortName) {
+        return gameData.collection.shortName;
     }
 
-    if (typeof api !== 'undefined' && api.collections) {
-        for (var i = 0; i < api.collections.count; i++) {
-            var collection = api.collections.get(i);
-            if (collection && collection.games) {
-                for (var j = 0; j < collection.games.count; j++) {
-                    var game = collection.games.get(j);
-                    if (game && gameData) {
-                        if (game.title === gameData.title &&
-                            game.releaseYear === gameData.releaseYear) {
-                            return collection.shortName;
-                            }
-                    }
-                }
+    if (gameData.collections && gameData.collections.count > 0) {
+
+        for (var i = 0; i < gameData.collections.count; i++) {
+            var collection = gameData.collections.get(i);
+
+            if (collection && collection.shortName) {
+                return collection.shortName;
             }
         }
     }
 
+    if (gameData.systemShortName) {
+        return gameData.systemShortName;
+    }
+
+    if (gameData.extra && gameData.extra.collectionShortName) {
+        return gameData.extra.collectionShortName;
+    }
+
+    console.log("No shortName found for game:", gameData.title);
     return "";
 }
 
@@ -368,7 +376,43 @@ function getSystemImagePath(shortName) {
 }
 
 function shouldShowSystemIcon(currentCollectionShortName) {
-    if (!currentCollectionShortName) return false;
+    if (!currentCollectionShortName) {
+        return false;
+    }
+
     var shortName = currentCollectionShortName.toLowerCase();
-    return shortName === "history" || shortName === "favorite";
+    var shouldShow = shortName === "history" || shortName === "favorites" || shortName === "favorite";
+
+    return shouldShow;
+}
+
+function getRandomPixlOSIcon() {
+    var totalIcons = 13;
+    var randomIndex = Math.floor(Math.random() * totalIcons);
+    var iconPath = "assets/images/PIXL-OS/icon_" + randomIndex + ".png";
+    return iconPath;
+}
+
+function getCollectionIcon(collectionName) {
+    if (!collectionName) return getRandomPixlOSIcon();
+    var hash = 0;
+    for (var i = 0; i < collectionName.length; i++) {
+        hash = collectionName.charCodeAt(i) + ((hash << 5) - hash);
+    }
+
+    var totalIcons = 13;
+    var iconIndex = Math.abs(hash) % totalIcons;
+    var iconPath = "assets/images/PIXL-OS/icon_" + iconIndex + ".png";
+    return iconPath;
+}
+
+function getFallbackPixlOSIcon() {
+    if (fallbackIcon !== null) {
+        return fallbackIcon;
+    }
+
+    var totalIcons = 13;
+    var randomIndex = Math.floor(Math.random() * totalIcons);
+    fallbackIcon = "assets/images/PIXL-OS/icon_" + randomIndex + ".png";
+    return fallbackIcon;
 }

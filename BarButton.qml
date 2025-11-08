@@ -6,6 +6,7 @@ Row {
     property string iconText: ""
     property string label: ""
     property string iconSource: ""
+    property bool rotating: false
 
     spacing: 10 * vpx
     opacity: (label !== "" || iconSource !== "") ? 1 : 0
@@ -26,15 +27,44 @@ Row {
         visible: iconSource === ""
     }
 
-    Image {
+    Item {
+        id: iconContainer
         width: 27 * vpx
         height: 27 * vpx
-        source: iconSource
-        fillMode: Image.PreserveAspectFit
-        smooth: true
-        mipmap: true
         anchors.verticalCenter: parent.verticalCenter
         visible: iconSource !== ""
+
+        Image {
+            id: staticIcon
+            anchors.centerIn: parent
+            width: parent.width
+            height: parent.height
+            source: iconSource
+            fillMode: Image.PreserveAspectFit
+            smooth: true
+            mipmap: true
+            visible: !btn.rotating
+        }
+
+        Image {
+            id: spinnerIcon
+            anchors.centerIn: parent
+            width: parent.width
+            height: parent.height
+            source: iconSource
+            fillMode: Image.PreserveAspectFit
+            smooth: true
+            mipmap: true
+            visible: btn.rotating
+
+            RotationAnimation on rotation {
+                from: 0
+                to: 360
+                duration: 1000
+                loops: Animation.Infinite
+                running: spinnerIcon.visible
+            }
+        }
     }
 
     Text {
@@ -45,5 +75,12 @@ Row {
         }
         color: "white"
         anchors.verticalCenter: parent.verticalCenter
+    }
+
+    onRotatingChanged: {
+        if (!rotating) {
+            staticIcon.rotation = 0
+            spinnerIcon.rotation = 0
+        }
     }
 }

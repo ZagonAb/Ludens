@@ -7,7 +7,36 @@ FocusScope {
 
     property var collection
     property int collectionIndex: 0
+    property bool currentRALoading: false
+    property bool currentRAAvailable: false
+    property bool panelsBlurred: false
+
+    function applyBlurEffects(shouldBlur) {
+        panelsBlurred = shouldBlur;
+    }
+
     signal backRequested()
+
+    Connections {
+        target: gameRoot
+        function onCurrentRALoadingChanged() {
+            bottomBar.updateRAStatus(gameRoot.currentRALoading, gameRoot.currentRAAvailable)
+        }
+        function onCurrentRAAvailableChanged() {
+            bottomBar.updateRAStatus(gameRoot.currentRALoading, gameRoot.currentRAAvailable)
+        }
+    }
+
+    onVisibleChanged: {
+        if (!visible) {
+            currentRALoading = false
+            currentRAAvailable = false
+            bottomBar.resetRAStatus()
+            applyBlurEffects(false);
+        } else if (gameList.currentGame) {
+            bottomBar.updateRAStatus(currentRALoading, currentRAAvailable)
+        }
+    }
 
     Rectangle {
         id: leftPanel
@@ -17,8 +46,26 @@ FocusScope {
             top: parent.top
             bottom: parent.bottom
         }
+
         width: 280 * vpx
         color: bgSecondary
+
+        opacity: gameRoot.panelsBlurred ? 0.4 : 1.0
+        scale: gameRoot.panelsBlurred ? 0.95 : 1.0
+
+        Behavior on opacity {
+            NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
+        }
+
+        Behavior on scale {
+            NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
+        }
+
+        layer.enabled: gameRoot.panelsBlurred
+        layer.effect: FastBlur {
+            radius: 32
+            transparentBorder: true
+        }
 
         StatusBar {
             id: gameViewStatusBar
@@ -52,7 +99,7 @@ FocusScope {
 
                 onStatusChanged: {
                     if (status === Image.Error) {
-                        source = "assets/images/icon.png"
+                        source = "assets/images/PIXL-OS/icon_0.png"
                     }
                 }
             }
@@ -99,23 +146,6 @@ FocusScope {
         }
     }
 
-    Rectangle {
-        id: rightPanel
-        anchors {
-            left: gameList.right
-            top: parent.top
-            right: parent.right
-            bottom: parent.bottom
-        }
-        color: root.getHueColor(collectionIndex)
-
-        GameDetails {
-            anchors.fill: parent
-            game: gameList.currentGame
-            collectionIndex: gameRoot.collectionIndex
-        }
-    }
-
     GameList {
         id: gameList
         anchors {
@@ -129,6 +159,23 @@ FocusScope {
         model: collection ? collection.games : null
         focus: true
         collectionIndex: gameRoot.collectionIndex
+
+        opacity: gameRoot.panelsBlurred ? 0.4 : 1.0
+        scale: gameRoot.panelsBlurred ? 0.95 : 1.0
+
+        Behavior on opacity {
+            NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
+        }
+
+        Behavior on scale {
+            NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
+        }
+
+        layer.enabled: gameRoot.panelsBlurred
+        layer.effect: FastBlur {
+            radius: 32
+            transparentBorder: true
+        }
 
         property string currentCollectionShortName: collection ? collection.shortName : ""
 
@@ -145,6 +192,28 @@ FocusScope {
             else if (api.keys.isDetails(event)) {
                 event.accepted = true
                 toggleFavorite()
+            }
+            else if (api.keys.isFilters(event)) {
+                event.accepted = true
+
+                if (currentGame && currentRAAvailable) {
+                    soundManager.playOk()
+
+                    if (shouldUpdateRA()) {
+                        if (typeof currentGame.updateRetroAchievements === 'function') {
+                            currentGame.updateRetroAchievements()
+                        }
+                    }
+
+                    retroAchievementsView.updateGame(currentGame)
+                    retroAchievementsView.show()
+
+                    gameRoot.applyBlurEffects(true);
+                } else if (currentGame) {
+                    soundManager.playNoticeBack()
+                } else {
+                    soundManager.playCancel()
+                }
             }
             else {
                 event.accepted = false
@@ -175,7 +244,7 @@ FocusScope {
             if (currentGame) {
                 var wasFavorite = currentGame.favorite
                 currentGame.favorite = !currentGame.favorite
-                console.log("Game favorite status toggled:", currentGame.title, "Favorite:", currentGame.favorite)
+                //console.log("Game favorite status toggled:", currentGame.title, "Favorite:", currentGame.favorite)
                 currentIndexChanged()
                 if (currentGame.favorite) {
                     soundManager.playNotice()
@@ -184,6 +253,75 @@ FocusScope {
                 }
 
                 favoriteNotification.show(currentGame.favorite, Utils.cleanGameTitle(currentGame.title))
+            }
+        }
+
+        function shouldUpdateRA() {
+            if (!currentGame) return false
+
+                var gameKey = currentGame.title + "_" + (currentGame.RaGameId || "0")
+                var cachedData = gameList.raCache[gameKey]
+
+                if (!cachedData) return true
+
+                    var fiveMinutes = 5 * 60 * 1000
+                    var now = new Date().getTime()
+
+                    return (now - cachedData.timestamp) > fiveMinutes
+        }
+    }
+
+    Rectangle {
+        id: rightPanel
+
+        anchors {
+            left: gameList.right
+            top: parent.top
+            right: parent.right
+            bottom: parent.bottom
+        }
+
+        color: root.getHueColor(collectionIndex)
+
+        opacity: gameRoot.panelsBlurred ? 0.4 : 1.0
+        scale: gameRoot.panelsBlurred ? 0.95 : 1.0
+
+        Behavior on opacity {
+            NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
+        }
+
+        Behavior on scale {
+            NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
+        }
+
+        layer.enabled: gameRoot.panelsBlurred
+        layer.effect: FastBlur {
+            radius: 32
+            transparentBorder: true
+        }
+
+        GameDetails {
+            anchors.fill: parent
+            game: gameList.currentGame
+            collectionIndex: gameRoot.collectionIndex
+        }
+    }
+
+    RetroAchievementsView {
+        id: retroAchievementsView
+        z: 100
+
+        parent: gameRoot
+        collectionIndex: gameRoot.collectionIndex
+
+        onBackRequested: {
+            gameList.focus = true
+            gameRoot.applyBlurEffects(false);
+        }
+
+        onVisibleChanged: {
+            if (!visible) {
+                gameRoot.applyBlurEffects(false);
             }
         }
     }
@@ -196,7 +334,7 @@ FocusScope {
 
     function launchGame() {
         if (gameList.currentGame) {
-            console.log("Launching game:", gameList.currentGame.title)
+            //console.log("Launching game:", gameList.currentGame.title)
 
             api.memory.set('lastGameIndex', gameList.currentIndex)
             api.memory.set('lastCollectionIndex', collectionIndex)
@@ -214,7 +352,7 @@ FocusScope {
         interval: 100
         repeat: false
         onTriggered: {
-            console.log("Restoring focus after game exit")
+            //console.log("Restoring focus after game exit")
             gameList.enabled = true
             gameList.focus = true
 

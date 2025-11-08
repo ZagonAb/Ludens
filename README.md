@@ -1,6 +1,6 @@
 # Ludens
 
-- Ludens — a minimalist theme for Pegasus Frontend, inspired by [Ludo Frontend](https://ludo.libretro.com/) and focused on clean visuals and smooth navigation.
+- Ludens — a minimalist theme for Pixl-OS, inspired by [Ludo Libretro](https://ludo.libretro.com/) and focused on clean visuals and smooth navigation.
 
 ![screen0](https://github.com/ZagonAb/Luden/blob/1169a46406e888152843eceafe9892938f494147/.meta/screenshots/screen0.png)
 
@@ -9,17 +9,17 @@
 
 ## 🧩 Inspiration
 
-**Ludens** takes visual inspiration from [Ludo Frontend](https://ludo.libretro.com), an open-source game launcher developed by the **Libretro Team**.  
-It reimagines Ludo’s minimalist look and feel within the **Pegasus Frontend** environment, adapting its design language for a smooth and modern user experience.
+**Ludens** takes visual inspiration from [Ludo Libretro](https://ludo.libretro.com), an open-source game launcher developed by the **Libretro Team**.  
+It reimagines Ludo’s minimalist look and feel within the **Pixl-OS** environment, adapting its design language for a smooth and modern user experience.
 
 ---
 
 ## 🎨 Assets and Credits
 
 - **Sound Effects:**  
-  Some sound effects used in **Ludens** are derived from [Ludo Frontend](https://ludo.libretro.com/) by the **Libretro Team**.  
+  Some sound effects used in **Ludens** are derived from [Ludo Libretro](https://ludo.libretro.com/) by the **Libretro Team**.  
   Licensed under the [GPL-3.0 license](https://www.gnu.org/licenses/gpl-3.0.html).  
-  Credit goes to the original Ludo Frontend project for their audio design and inspiration.
+  Credit goes to the original Ludo Libretro project for their audio design and inspiration.
 
 - **Icons and UI Assets:**  
   Certain icons and interface elements are sourced from the [RetroArch Assets repository](https://github.com/libretro/retroarch-assets) by the **Libretro Team**,  
@@ -27,10 +27,6 @@ It reimagines Ludo’s minimalist look and feel within the **Pegasus Frontend** 
   These assets may be used, modified, and redistributed with proper attribution.
 
 ---
-
-## Installation
-
-[Download](https://github.com/ZagonAb/Ludens/archive/refs/heads/main.zip) and extract the theme to your [theme directory](http://pegasus-frontend.org/docs/user-guide/installing-themes). You can then select it from the Pegasus settings menu.
 
 ## 📜 License
 

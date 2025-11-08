@@ -78,8 +78,8 @@ Item {
 
     Image {
         anchors.centerIn: parent
-        width: parent.width * 0.6
-        height: parent.height * 0.6
+        width: parent.width * 0.7
+        height: parent.height * 0.7
         source: iconSource
         fillMode: Image.PreserveAspectFit
         smooth: true

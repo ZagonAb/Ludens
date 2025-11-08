@@ -216,7 +216,7 @@ Item {
         text: label
         font {
             family: global.fonts.sans
-            pixelSize: 12 * vpx
+            pixelSize: 16 * vpx
         }
         color: isSelected ? (root.isLightTheme ? "#000000" : "#ffffff") : textSecondary
         opacity: isSelected ? 1.0 : 0.0

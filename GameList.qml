@@ -7,7 +7,16 @@ ListView {
 
     property var currentGame: currentItem ? currentItem.gameData : null
     property int collectionIndex: 0
-    property string currentCollectionShortName: ""
+    property string currentCollectionShortName: {
+        if (collection) {
+            //console.log("GameList collection:", collection.name, "shortName:", collection.shortName);
+            return collection.shortName || "";
+        }
+        //console.log("GameList: No collection available");
+        return "";
+    }
+    property var raCache: ({})
+    property bool skipNextUpdate: false
 
     clip: true
     spacing: 10 * vpx
@@ -19,8 +28,85 @@ ListView {
     preferredHighlightEnd: height / 2 + 70 * vpx
     highlightFollowsCurrentItem: true
 
+    onVisibleChanged: {
+        if (visible && gameList.currentGame) {
+            bottomBar.updateRAStatus(currentRALoading, currentRAAvailable)
+        }
+    }
+
     Component.onCompleted: {
         positionViewAtIndex(0, ListView.Center)
+        initializeFirstGameTimer.start()
+    }
+
+    Component.onDestruction: {
+        raCheckTimer.stop()
+    }
+
+    function updateCurrentGameRA() {
+        if (!currentGame) {
+            finishRALoading(false)
+            return
+        }
+
+        //console.log("🔄 Checking RA for:", currentGame.title)
+
+        var gameKey = currentGame.title + "_" + (currentGame.RaGameId || "0")
+
+        if (raCache[gameKey]) {
+            //console.log("✅ Using cached RA data for:", currentGame.title)
+            var cachedData = raCache[gameKey]
+            finishRALoading(cachedData.hasRA, true)
+            return
+        }
+
+        if (currentGame.retroAchievementsCount > 0) {
+            //console.log("✅ RA already loaded for:", currentGame.title, "Count:", currentGame.retroAchievementsCount)
+            cacheRAData(currentGame, true)
+            finishRALoading(true)
+            return
+        }
+
+        gameRoot.currentRALoading = true
+        gameRoot.currentRAAvailable = false
+        bottomBar.updateRAStatus(true, false)
+
+        if (typeof currentGame.initRetroAchievements === 'function') {
+            currentGame.initRetroAchievements()
+        }
+
+        if (typeof currentGame.updateRetroAchievements === 'function' && currentGame.retroAchievementsCount === 0) {
+            //console.log("📡 Fetching RA data for:", currentGame.title)
+            currentGame.updateRetroAchievements()
+            raCheckTimer.triggeredCount = 0
+            raCheckTimer.restart()
+        } else {
+            //console.log("❌ No RA data available for:", currentGame.title)
+            cacheRAData(currentGame, false)
+            finishRALoading(false)
+        }
+    }
+
+    function cacheRAData(game, hasRA) {
+        var gameKey = game.title + "_" + (game.RaGameId || "0")
+        raCache[gameKey] = {
+            hasRA: hasRA,
+            timestamp: new Date().getTime(),
+            count: game.retroAchievementsCount || 0
+        }
+        //console.log("💾 Cached RA data for:", game.title, "HasRA:", hasRA)
+    }
+
+    function finishRALoading(hasRA, fromCache = false) {
+        if (!fromCache && currentGame) {
+            cacheRAData(currentGame, hasRA)
+        }
+
+        //console.log(hasRA ? "✅ RA loaded - Achievements available" : "❌ RA loaded - No achievements")
+        gameRoot.currentRALoading = false
+        gameRoot.currentRAAvailable = hasRA
+        bottomBar.updateRAStatus(false, hasRA)
+        raCheckTimer.stop()
     }
 
     delegate: Item {
@@ -120,14 +206,41 @@ ListView {
                     anchors.centerIn: parent
                     width: parent.width
                     height: parent.height
-                    source: modelData.assets.boxFront || modelData.assets.screenshot || ""
+                    source: {
+                        if (modelData.assets.boxFront && modelData.assets.boxFront !== "") {
+                            return modelData.assets.boxFront;
+                        } else if (modelData.assets.screenshot && modelData.assets.screenshot !== "") {
+                            return modelData.assets.screenshot;
+                        } else if (modelData.assets.titlescreen && modelData.assets.titlescreen !== "") {
+                            return modelData.assets.titlescreen;
+                        } else if (modelData.assets.logo && modelData.assets.logo !== "") {
+                            return modelData.assets.logo;
+                        } else if (modelData.assets.banner && modelData.assets.banner !== "") {
+                            return modelData.assets.banner;
+                        } else {
+                            return "assets/images/PIXL-OS/icon_0.png" /*Utils.getFallbackPixlOSIcon() //random images*/
+                        }
+                    }
                     fillMode: Image.PreserveAspectFit
                     smooth: true
                     asynchronous: true
 
                     onStatusChanged: {
-                        if (status === Image.Error || status === Image.Null) {
-                            source = "assets/images/icon.png"
+                        if (status === Image.Error) {
+                            console.log("Image failed for game:", modelData.title, "Source:", source);
+                            if (source === modelData.assets.boxFront && modelData.assets.screenshot) {
+                                source = modelData.assets.screenshot;
+                            } else if (source === modelData.assets.screenshot && modelData.assets.titlescreen) {
+                                source = modelData.assets.titlescreen;
+                            } else if (source === modelData.assets.titlescreen && modelData.assets.logo) {
+                                source = modelData.assets.logo;
+                            } else if (source === modelData.assets.logo && modelData.assets.banner) {
+                                source = modelData.assets.banner;
+                            } else {
+                                source = "assets/images/PIXL-OS/icon_0.png" /*Utils.getFallbackPixlOSIcon() //random images*/
+                            }
+                        } else if (status === Image.Ready) {
+                            console.log("Image loaded successfully for game:", modelData.title);
                         }
                     }
                 }
@@ -233,7 +346,7 @@ ListView {
                     id: systemIndicatorContainer
                     anchors {
                         left: favoriteIndicatorContainer.right
-                        leftMargin: 8 * vpx
+                        leftMargin: 2 * vpx
                         bottom: parent.bottom
                         bottomMargin: 5 * vpx
                     }
@@ -279,6 +392,90 @@ ListView {
                         color: "#40000000"
                     }
                 }
+
+                Item {
+                    id: systemTextContainer
+                    anchors {
+                        left: systemIndicatorContainer.right
+                        leftMargin: 2 * vpx
+                        bottom: parent.bottom
+                        bottomMargin: 5 * vpx
+                    }
+                    width: Math.min(150 * vpx, systemNameText.implicitWidth + 20 * vpx)
+                    height: 33 * vpx
+                    visible: isCurrent && Utils.shouldShowSystemIcon(list.currentCollectionShortName) &&
+                    systemNameText.text !== ""
+
+                    Rectangle {
+                        id: systemTextBackground
+                        anchors.fill: parent
+                        color: "#80000000"
+                        radius: height / 2
+                    }
+
+                    Text {
+                        id: systemNameText
+                        anchors {
+                            verticalCenter: parent.verticalCenter
+                            left: parent.left
+                            right: parent.right
+                            leftMargin: 10 * vpx
+                            rightMargin: 10 * vpx
+                        }
+
+                        text: {
+                            if (!isCurrent || !gameData) {
+                                //console.log("systemNameText: Not current or no gameData");
+                                return "";
+                            }
+
+                            var shouldShow = Utils.shouldShowSystemIcon(list.currentCollectionShortName);
+                            //console.log("Should show system icon:", shouldShow, "for collection:", list.currentCollectionShortName);
+
+                            if (!shouldShow) return "";
+
+                            var collectionShortName = Utils.getGameCollectionShortName(gameData);
+                            //console.log("Retrieved shortName:", collectionShortName, "for game:", gameData.title);
+
+                            if (!collectionShortName || collectionShortName === "") return "";
+
+                            var displayName = collectionShortName.toUpperCase();
+                            //console.log("Final display name:", displayName);
+
+                            return displayName;
+                        }
+
+                        font {
+                            family: global.fonts.sans
+                            pixelSize: 12 * vpx
+                            bold: true
+                        }
+                        color: "#ffffff"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        elide: Text.ElideRight
+
+                        layer.enabled: true
+                        layer.effect: DropShadow {
+                            transparentBorder: true
+                            horizontalOffset: 1
+                            verticalOffset: 1
+                            radius: 2
+                            samples: 5
+                            color: "#40000000"
+                        }
+                    }
+
+                    layer.enabled: true
+                    layer.effect: DropShadow {
+                        transparentBorder: true
+                        horizontalOffset: 1
+                        verticalOffset: 1
+                        radius: 2
+                        samples: 5
+                        color: "#40000000"
+                    }
+                }
             }
         }
 
@@ -298,9 +495,9 @@ ListView {
                 if (flagsCount === 0) return 0;
 
                 if (flagsCount <= 4) {
-                    return 85 * vpx;
+                    return 50 * vpx;
                 } else {
-                    return 85 * vpx;
+                    return 100 * vpx;
                 }
             }
 
@@ -308,17 +505,20 @@ ListView {
             property int flagsToShow: Math.min(regionFlags.length, maxFlags)
             property int columns: flagsToShow > 4 ? 2 : 1
             property int rows: Math.ceil(flagsToShow / columns)
-            property real flagWidth: 40 * vpx
+            property real flagWidth: 45 * vpx
             property real flagHeight: 30 * vpx
 
             Grid {
                 anchors.centerIn: parent
                 columns: parent.columns
                 rows: parent.rows
-                spacing: 1 * vpx
+                spacing: 3 * vpx
+                columnSpacing: 5 * vpx
+                rowSpacing: 3 * vpx
 
                 Repeater {
                     model: parent.parent.flagsToShow
+
                     delegate: Image {
                         width: parent.parent.flagWidth
                         height: parent.parent.flagHeight
@@ -327,38 +527,13 @@ ListView {
                         smooth: true
                         mipmap: true
                         asynchronous: true
-                        visible: false
-
-                        property int currentVariantIndex: 0
-                        property var regionVariants: getRegionVariants(index)
-
-                        function getRegionVariants(flagIndex) {
-                            var variants = [];
-                            if (!regionFlags || regionFlags.length === 0) return variants;
-
-                            var baseIndex = flagIndex * 7;
-                            for (var i = baseIndex; i < Math.min(baseIndex + 7, regionFlags.length); i++) {
-                                variants.push(regionFlags[i]);
-                            }
-                            return variants;
-                        }
 
                         onStatusChanged: {
                             if (status === Image.Error) {
-                                if (currentVariantIndex < regionVariants.length - 1) {
-                                    currentVariantIndex++;
-                                    source = regionVariants[currentVariantIndex];
-                                } else {
-                                    visible = false;
-                                }
+                                console.log("Flag image failed to load:", source);
+                                visible = false;
                             } else if (status === Image.Ready) {
                                 visible = true;
-                            }
-                        }
-
-                        Component.onCompleted: {
-                            if (regionVariants.length > 0) {
-                                source = regionVariants[0];
                             }
                         }
                     }
@@ -368,6 +543,75 @@ ListView {
 
         onIsCurrentChanged: {
             bubbleCanvas.requestPaint()
+        }
+    }
+
+    onCurrentGameChanged: {
+        //console.log("Game changed to:", currentGame ? currentGame.title : "null")
+
+        raCheckTimer.stop()
+        raUpdateTimer.stop()
+
+        if (currentGame) {
+            raUpdateTimer.restart()
+        } else {
+            finishRALoading(false)
+        }
+    }
+
+    Timer {
+        id: raCheckTimer
+        interval: 500
+        repeat: true
+        running: false
+        property int triggeredCount: 0
+
+        onTriggered: {
+            triggeredCount++
+
+            if (!currentGame) {
+                finishRALoading(false)
+                return
+            }
+
+            var hasRA = currentGame.retroAchievementsCount > 0
+
+            if (hasRA) {
+                //console.log("🎯 RA Count:", currentGame.retroAchievementsCount)
+                finishRALoading(true)
+            } else if (triggeredCount >= 6) {
+                //console.log("⏰ RA timeout - no achievements found")
+                finishRALoading(false)
+            }
+        }
+    }
+
+    Timer {
+        id: raUpdateTimer
+        interval: 50
+        onTriggered: {
+            updateCurrentGameRA()
+        }
+    }
+
+    Timer {
+        id: initializeFirstGameTimer
+        interval: 500
+        onTriggered: {
+            if (currentGame && typeof currentGame.initRetroAchievements === 'function') {
+                currentGame.initRetroAchievements()
+                //console.log("Initial RA initialization for:", currentGame.title)
+
+                if (typeof currentGame.updateRetroAchievements === 'function') {
+                    currentGame.updateRetroAchievements()
+                }
+
+                raCheckTimer.triggeredCount = 0
+                raCheckTimer.restart()
+            } else if (currentGame) {
+                //console.log("Game has no RA functions:", currentGame.title)
+                finishRALoading(false)
+            }
         }
     }
 

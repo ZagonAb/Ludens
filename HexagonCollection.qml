@@ -1,4 +1,5 @@
 import QtQuick 2.15
+import "utils.js" as Utils
 
 Item {
     id: hexItem
@@ -30,23 +31,23 @@ Item {
 
             onStatusChanged: {
                 if (status === Image.Error) {
-                    source = "assets/images/icon.png"
+                    source = "assets/images/PIXL-OS/icon_0.png" /*Utils.getFallbackPixlOSIcon() //random images*/
                 }
             }
         }
     }
 
     function getCollectionImage() {
-        if (!collectionData) return ""
+        if (!collectionData) return Utils.getRandomPixlOSIcon();
 
-            var shortName = collectionData.shortName.toLowerCase()
+        var shortName = collectionData.shortName.toLowerCase();
 
-            if (shortName === "favorite") {
-                return "assets/images/systems/favorite.png"
-            } else if (shortName === "history") {
-                return "assets/images/systems/history.png"
-            }
+        if (shortName === "favorite") {
+            return "assets/images/systems/favorite.png";
+        } else if (shortName === "history") {
+            return "assets/images/systems/history.png";
+        }
 
-            return "assets/images/systems/" + shortName + ".png"
+        return "assets/images/systems/" + shortName + ".png";
     }
 }

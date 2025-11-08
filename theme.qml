@@ -124,7 +124,6 @@ FocusScope {
 
     BottomBar {
         id: bottomBar
-
         anchors {
             left: parent.left
             right: parent.right
@@ -146,6 +145,10 @@ FocusScope {
     }
 
     Component.onCompleted: {
+        if (typeof Utils !== 'undefined' && Utils.fallbackIcon !== undefined) {
+            Utils.fallbackIcon = null;
+        }
+
         var savedSaturation = api.memory.get('hueSaturation')
         var savedLightness = api.memory.get('hueLightness')
         if (savedSaturation !== undefined) hueSaturation = savedSaturation

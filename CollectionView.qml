@@ -1,5 +1,6 @@
 import QtQuick 2.15
 import QtGraphicalEffects 1.12
+import "utils.js" as Utils
 
 FocusScope {
     id: collectionRoot
@@ -14,17 +15,17 @@ FocusScope {
         id: collectionsModelManager
 
         onModelBuilt: {
-            console.log("Model built, count:", model.count)
+            //console.log("Model built, count:", model.count)
             restoreInitialIndex()
         }
 
         Component.onCompleted: {
-            console.log("CollectionsModel component completed")
+            //console.log("CollectionsModel component completed")
         }
     }
 
     function setInitialIndex(index) {
-        console.log("Setting initial index to:", index)
+        //console.log("Setting initial index to:", index)
         if (index >= 0 && index < collectionsModelManager.model.count) {
             actualCurrentIndex = index
             collectionList.currentIndex = index
@@ -39,9 +40,9 @@ FocusScope {
     }
 
     function restoreInitialIndex() {
-        console.log("Restoring initial index...")
+        //console.log("Restoring initial index...")
         var lastIndex = api.memory.get('collectionIndex')
-        console.log("Last index from memory:", lastIndex)
+        //console.log("Last index from memory:", lastIndex)
 
         if (lastIndex !== undefined && lastIndex !== null) {
             restoreTimer.lastIndex = lastIndex
@@ -56,15 +57,15 @@ FocusScope {
         property int lastIndex: 0
         interval: 100
         onTriggered: {
-            console.log("Timer triggered, setting index to:", lastIndex)
+            //console.log("Timer triggered, setting index to:", lastIndex)
             setInitialIndex(lastIndex)
         }
     }
 
     Component.onCompleted: {
-        console.log("CollectionView component completed")
+        //console.log("CollectionView component completed")
         if (collectionsModelManager.modelReady) {
-            console.log("Model already ready on CollectionView completion")
+            //console.log("Model already ready on CollectionView completion")
             restoreInitialIndex()
         }
     }
@@ -99,7 +100,15 @@ FocusScope {
             anchors.fill: parent
             size: hexSize * 0.3
             color: root.getHueColor(collectionIndex)
-            iconSource: "assets/images/icon.png"
+            iconSource: "" /*Utils.getFallbackPixlOSIcon() //random images*/
+            Image {
+                anchors.centerIn: parent
+                width: parent.width * 0.84
+                height: parent.height * 0.84
+                source: "assets/images/PIXL-OS/icon_0.png"
+                fillMode: Image.PreserveAspectFit
+                mipmap: true
+            }
         }
     }
 
@@ -133,6 +142,24 @@ FocusScope {
         preferredHighlightEnd: width / 2 + hexSize * 0.9
         highlightMoveDuration: 350
         spacing: 0
+
+
+        opacity: globalColorConfig.focus ? 0.4 : 1.0
+        scale: globalColorConfig.focus ? 0.95 : 1.0
+
+        Behavior on opacity {
+            NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
+        }
+
+        Behavior on scale {
+            NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
+        }
+
+        layer.enabled: globalColorConfig.focus
+        layer.effect: FastBlur {
+            radius: 32
+            transparentBorder: true
+        }
 
         model: collectionsModelManager.model
 
@@ -185,8 +212,19 @@ FocusScope {
         Keys.onPressed: {
             if (api.keys.isAccept(event)) {
                 event.accepted = true
-                soundManager.playOk()
-                selectCurrentCollection()
+
+                var currentCollection = collectionsModelManager.model.get(currentIndex)
+                if (currentCollection &&
+                    (currentCollection.shortName === "favorite" || currentCollection.shortName === "history") &&
+                    currentCollection.games &&
+                    currentCollection.games.count === 0) {
+                    //console.log("Cannot access empty " + currentCollection.name + " collection")
+                    soundManager.playNoticeBack()
+                    return
+                    }
+
+                    soundManager.playOk()
+                    selectCurrentCollection()
             } else if (api.keys.isLeft(event)) {
                 event.accepted = true
                 soundManager.playUp()
@@ -224,6 +262,23 @@ FocusScope {
         }
         spacing: 25 * vpx
 
+        opacity: globalColorConfig.focus ? 0.4 : 1.0
+        scale: globalColorConfig.focus ? 0.95 : 1.0
+
+        Behavior on opacity {
+            NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
+        }
+
+        Behavior on scale {
+            NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
+        }
+
+        layer.enabled: globalColorConfig.focus
+        layer.effect: FastBlur {
+            radius: 32
+            transparentBorder: true
+        }
+
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
             text: collectionsModelManager.model.count > 0 ?
@@ -258,18 +313,34 @@ FocusScope {
             api.memory.set('collectionIndex', actualCurrentIndex)
             var selectedCollection = collectionsModelManager.model.get(actualCurrentIndex)
 
-            var collectionObject = {
-                name: selectedCollection.name,
-                shortName: selectedCollection.shortName,
-                games: selectedCollection.games,
-                isVirtual: selectedCollection.isVirtual
-            }
+            if ((selectedCollection.shortName === "favorite" || selectedCollection.shortName === "history") &&
+                selectedCollection.games &&
+                selectedCollection.games.count === 0) {
+                //console.log(selectedCollection.name + " collection is empty, cannot access")
+                soundManager.playNoticeBack()
+                return
+                }
 
-            if (!selectedCollection.isVirtual && selectedCollection.originalCollection) {
-                collectionObject.originalCollection = selectedCollection.originalCollection
-            }
+                var collectionObject = {
+                    name: selectedCollection.name,
+                    shortName: selectedCollection.shortName,
+                    games: selectedCollection.games,
+                    isVirtual: selectedCollection.isVirtual
+                }
 
-            collectionSelected(collectionObject)
+                if (!selectedCollection.isVirtual && selectedCollection.originalCollection) {
+                    collectionObject.originalCollection = selectedCollection.originalCollection
+                }
+
+                if (selectedCollection.games && selectedCollection.games.count > 0) {
+                    var firstGame = selectedCollection.games.get(0)
+                    if (firstGame && typeof firstGame.initRetroAchievements === 'function') {
+                        firstGame.initRetroAchievements()
+                        //console.log("Pre-initialized RA for first game:", firstGame.title)
+                    }
+                }
+
+                collectionSelected(collectionObject)
         }
     }
 }
