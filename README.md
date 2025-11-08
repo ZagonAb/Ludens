@@ -2,11 +2,11 @@
 
 - Ludens — a minimalist theme for Pixl-OS.
 
-![screen0](https://github.com/ZagonAb/Ludens/blob/73b643c5efbea114eb262a86c95d629307d6bbbf/.meta/screenshots/screen0.png)
+![screen0](https://github.com/ZagonAb/Ludens/blob/89d15f5e495551f66823c7a679f683a7c88f6c3c/.meta/screenshots/screen0.png)
 
-![screen1](https://github.com/ZagonAb/Ludens/blob/73b643c5efbea114eb262a86c95d629307d6bbbf/.meta/screenshots/screen1.png)
+![screen1](https://github.com/ZagonAb/Ludens/blob/89d15f5e495551f66823c7a679f683a7c88f6c3c/.meta/screenshots/screen1.png)
 
-![screen2](https://github.com/ZagonAb/Ludens/blob/73b643c5efbea114eb262a86c95d629307d6bbbf/.meta/screenshots/screen2.png)
+![screen2](https://github.com/ZagonAb/Ludens/blob/89d15f5e495551f66823c7a679f683a7c88f6c3c/.meta/screenshots/screen2.png)
 
 
 ## 🧩 Inspiration
