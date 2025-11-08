@@ -131,6 +131,7 @@ FocusScope {
         }
         height: 60 * root.vpx
         inGameView: root.inCollectionView
+        blurred: root.inCollectionView && gameView.panelsBlurred
     }
 
     StatusBar {

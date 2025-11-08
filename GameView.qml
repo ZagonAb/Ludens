@@ -13,6 +13,7 @@ FocusScope {
 
     function applyBlurEffects(shouldBlur) {
         panelsBlurred = shouldBlur;
+        bottomBar.blurred = shouldBlur;
     }
 
     signal backRequested()
@@ -322,6 +323,8 @@ FocusScope {
         onVisibleChanged: {
             if (!visible) {
                 gameRoot.applyBlurEffects(false);
+            } else {
+                gameRoot.applyBlurEffects(true);
             }
         }
     }
