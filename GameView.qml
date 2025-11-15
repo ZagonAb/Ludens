@@ -101,6 +101,7 @@ FocusScope {
             color: root.getHueColor(collectionIndex)
 
             Image {
+                id: systemImage
                 anchors.centerIn: parent
                 width: parent.width * 0.5
                 height: parent.height * 0.5
@@ -108,10 +109,19 @@ FocusScope {
                 fillMode: Image.PreserveAspectFit
                 smooth: true
                 mipmap: true
+                cache: false
 
                 onStatusChanged: {
                     if (status === Image.Error) {
                         source = "assets/images/PIXL-OS/icon_0.png"
+                    }
+                }
+
+                Connections {
+                    target: gameRoot
+                    function onCollectionChanged() {
+                        systemImage.source = ""
+                        systemImage.source = getSystemImage()
                     }
                 }
             }
