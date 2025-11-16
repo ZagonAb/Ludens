@@ -401,9 +401,8 @@ ListView {
                 Item {
                     id: systemTextContainer
                     anchors {
-                        left: favoriteIndicatorContainer.right
-                        //left: systemIndicatorContainer.right
-                        leftMargin: 2 * vpx
+                        left: favoriteIndicatorContainer.visible ? favoriteIndicatorContainer.right : favoriteIndicatorContainer.left
+                        leftMargin: favoriteIndicatorContainer.visible ? 2 * vpx : 0
                         bottom: parent.bottom
                         bottomMargin: 5 * vpx
                     }
