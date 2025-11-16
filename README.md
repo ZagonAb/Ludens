@@ -1,6 +1,6 @@
 # Ludens
 
-- Ludens — a minimalist theme for [Pixl-OS.](https://www.pixl-os.com/)
+- Ludens — a minimalist theme for [PixL-OS.](https://www.pixl-os.com/)
 
 ![screen0](https://github.com/ZagonAb/Ludens/blob/89d15f5e495551f66823c7a679f683a7c88f6c3c/.meta/screenshots/screen0.png)
 
@@ -12,7 +12,7 @@
 ## 🧩 Inspiration
 
 **Ludens** takes visual inspiration from [Ludo Frontend](https://ludo.libretro.com), an open-source game launcher developed by the **Libretro Team**.  
-It reimagines Ludo’s minimalist look and feel within the [Pixl-OS](https://www.pixl-os.com/) environment, adapting its design language for a smooth and modern user experience.
+It reimagines Ludo’s minimalist look and feel within the [PixL-OS](https://www.pixl-os.com/) environment, adapting its design language for a smooth and modern user experience.
 
 ---
 
